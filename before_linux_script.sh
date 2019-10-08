@@ -1,7 +1,7 @@
 set -ex
 
-sh -e /etc/init.d/xvfb start
-sleep 3 # give xvfb some time to start
+#sh -e /etc/init.d/xvfb start
+#sleep 3 # give xvfb some time to start
 
 # init key for pass
 gpg --batch --gen-key <<-EOF
