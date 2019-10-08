@@ -34,5 +34,13 @@ jobs:
 #        pytest
     - name: Build docker container
       run: |
-        cd emoji
-        docker build -t hbouvier/emojizer .
+        docker build -t hbouvier/emojizer -f emoji/Dockerfile emoji/
+    - name: Publish to Registry
+      run: |
+        docker login docker.pkg.github.com --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+        docker push hbouvier/emojizer
+      env:
+        DOCKER_USERNAME: ${{ secrets.GITHUB_DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.GITHUB_DOCKER_PASSWORD }}
+
+
