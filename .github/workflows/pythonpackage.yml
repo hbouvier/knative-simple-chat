@@ -10,6 +10,7 @@ jobs:
       max-parallel: 3
       matrix:
         python-version: [3.5, 3.6, 3.7]
+        # python-version: [3.7]
 
     steps:
     - uses: actions/checkout@v1
@@ -34,11 +35,11 @@ jobs:
 #        pytest
     - name: Build docker container
       run: |
-        docker build -t hbouvier/emojizer -f emoji/Dockerfile emoji/
+        docker build -t docker.io/hbouvier/emojizer -f emoji/Dockerfile emoji/
     - name: Publish to Registry
       run: |
-        docker login docker.pkg.github.com --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-        docker push hbouvier/emojizer
+        docker login docker.io --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+        docker push docker.io/hbouvier/emojizer
       env:
         DOCKER_USERNAME: ${{ secrets.GITHUB_DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.GITHUB_DOCKER_PASSWORD }}
