@@ -35,11 +35,11 @@ jobs:
 #        pytest
     - name: Build docker container
       run: |
-        docker build -t docker.pkg.github.com/hbouvier/knative-simple-chat/emojizer -f emoji/Dockerfile emoji/
+        docker build -t docker.pkg.github.com/hbouvier/knative-simple-chat/emojizer:latest -f emoji/Dockerfile emoji/
     - name: Publish to Registry
       run: |
         echo "${DOCKER_PASSWORD}" | docker login docker.pkg.github.com --username $DOCKER_USERNAME --password-stdin
-        docker push docker.pkg.github.com/hbouvier/knative-simple-chat/emojizer
+        docker push docker.pkg.github.com/hbouvier/knative-simple-chat/emojizer:latest
       env:
         DOCKER_USERNAME: ${{ secrets.GITHUB_DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.GITHUB_DOCKER_PASSWORD }}
