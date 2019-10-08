@@ -5,8 +5,7 @@ on: [push]
 jobs:
   build:
 
-    # runs-on: ubuntu-latest
-    runs-on: ubuntu-stretch
+    runs-on: ubuntu-latest
     strategy:
       max-parallel: 3
       matrix:
