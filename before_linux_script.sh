@@ -2,6 +2,7 @@ set -ex
 
 #sh -e /etc/init.d/xvfb start
 #sleep 3 # give xvfb some time to start
+# export GPG_TTY=$(tty)
 
 # init key for pass
 gpg --batch --gen-key <<-EOF
