@@ -1,0 +1,40 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: lemmanizer-fr
+spec:
+  template:
+    metadata:
+      # name: lemmanizer-fr-v8
+      annotations:
+        # Default: Knative concurrency-based autoscaling with
+        # 100 requests in-flight per pod.
+        # autoscaling.knative.dev/class:  kpa.autoscaling.knative.dev
+        # autoscaling.knative.dev/metric: concurrency
+        # Changed target to 1 to showcase autoscaling
+        # autoscaling.knative.dev/target: "1"
+        # Alternative: Kubernetes CPU-based autoscaling.
+        # autoscaling.knative.dev/class:  hpa.autoscaling.knative.dev
+        # autoscaling.knative.dev/metric: cpu
+        # Disable scale to zero with a minScale of 1.
+        autoscaling.knative.dev/minScale: "1"
+        # Limit max scaling to 5 pods.
+        # autoscaling.knative.dev/maxScale: "5"
+    spec:
+      containers:
+        - image: hbouvier/spacy_fr_lemmatizer:latest
+          env:
+            - name: SPACY_LANGUAGE
+              value: fr-CA
+            - name: SPACY_LANGUAGE_MODEL
+              value: fr_core_news_sm
+  # traffic:
+  # - tag: current
+  #   revisionName: lemmanizer-fr-v8
+  #   percent: 100
+  # - tag: previous
+  #   revisionName: lemmanizer-fr-v1
+  #   percent: 0
+  # - tag: latest
+  #   latestRevision: true
+  #   percent: 0

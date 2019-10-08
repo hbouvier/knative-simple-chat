@@ -1,0 +1,47 @@
+version: '2'
+
+vars:
+  VERSION: v0.0.10
+
+tasks:
+  default:
+    deps: [lemma_fr, lemma_en]
+
+  lemma_fr:
+    deps: [spacy_fr]
+    cmds:
+      - docker build -t hbouvier/spacy_fr_lemmatizer:{{.VERSION}} -f Dockerfile .
+      - docker push hbouvier/spacy_fr_lemmatizer:{{.VERSION}}
+    status:
+      - docker pull hbouvier/spacy_fr_lemmatizer:{{.VERSION}}
+
+  lemma_en:
+    deps: [spacy_en]
+    cmds:
+      - docker build -t hbouvier/spacy_en_lemmatizer:{{.VERSION}} -f Dockerfile.en .
+      - docker push hbouvier/spacy_en_lemmatizer:{{.VERSION}}
+    status:
+      - docker pull hbouvier/spacy_en_lemmatizer:{{.VERSION}}
+
+  spacy:
+    cmds:
+      - docker build -t hbouvier/spacy:v3.5.7 -f Dockerfile.spacy .
+      - docker push hbouvier/spacy:v3.5.7
+    status:
+      - docker pull hbouvier/spacy:v3.5.7
+
+  spacy_en:
+    deps: [spacy]
+    cmds:
+      - docker build -t hbouvier/spacy_en:v3.5.7 -f Dockerfile.spacy.en .
+      - docker push hbouvier/spacy_en:v3.5.7
+    status:
+      - docker pull hbouvier/spacy_en:v3.5.7
+
+  spacy_fr:
+    deps: [spacy]
+    cmds:
+      - docker build -t hbouvier/spacy_fr:v3.5.7 -f Dockerfile.spacy.fr .
+      - docker push hbouvier/spacy_fr:v3.5.7
+    status:
+      - docker pull hbouvier/spacy_fr:v3.5.7

@@ -1,0 +1,9 @@
+FROM hbouvier/spacy_en:v3.5.7
+WORKDIR /app
+
+COPY requirements.txt *.py /app/
+RUN pip install -r requirements.txt
+ENV SPACY_LANGUAGE=en-US \
+    SPACY_LANGUAGE_MODEL=en_core_web_sm
+
+CMD python lemma.py
