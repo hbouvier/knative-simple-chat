@@ -1,4 +1,4 @@
-FROM hbouvier/spacy_fr:v3.5.7
+FROM hbouvier/spacy_fr:v3.7
 # FROM python:3.7-slim
 
 WORKDIR /app

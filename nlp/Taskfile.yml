@@ -1,7 +1,7 @@
 version: '2'
 
 vars:
-  VERSION: v0.0.33
+  VERSION: v0.0.35
 
 tasks:
   default:
@@ -25,23 +25,23 @@ tasks:
 
   spacy:
     cmds:
-      - docker build -t hbouvier/spacy:v3.5.7 -f Dockerfile.spacy .
-      - docker push hbouvier/spacy:v3.5.7
+      - docker build -t hbouvier/spacy:v3.7 -f Dockerfile.spacy .
+      - docker push hbouvier/spacy:v3.7
     status:
-      - docker pull hbouvier/spacy:v3.5.7
+      - docker pull hbouvier/spacy:v3.7
 
   spacy_en:
     deps: [spacy]
     cmds:
-      - docker build -t hbouvier/spacy_en:v3.5.7 -f Dockerfile.spacy.en .
-      - docker push hbouvier/spacy_en:v3.5.7
+      - docker build -t hbouvier/spacy_en:v3.7 -f Dockerfile.spacy.en .
+      - docker push hbouvier/spacy_en:v3.7
     status:
-      - docker pull hbouvier/spacy_en:v3.5.7
+      - docker pull hbouvier/spacy_en:v3.7
 
   spacy_fr:
     deps: [spacy]
     cmds:
-      - docker build -t hbouvier/spacy_fr:v3.5.7 -f Dockerfile.spacy.fr .
-      - docker push hbouvier/spacy_fr:v3.5.7
+      - docker build -t hbouvier/spacy_fr:v3.7 -f Dockerfile.spacy.fr .
+      - docker push hbouvier/spacy_fr:v3.7
     status:
-      - docker pull hbouvier/spacy_fr:v3.5.7
+      - docker pull hbouvier/spacy_fr:v3.7
