@@ -15,21 +15,20 @@ lang  = os.environ['SPACY_LANGUAGE']
 
 nlp = spacy.load(model)
 
-input_content_type = 'application/cloudevents+json'
-output_content_type = 'application/json'
-
+# Binary (Content-Type: application/json)
+#       The CloudEvent envelop will be in HTTP Headers
+#       The body of the request contains ONLY the "even data"
+content_type = 'application/json'
 
 app = Flask(__name__)
-@app.route('/', methods=['POST']) 
+@app.route('/', methods=['POST'])
 def event_handler():
   m = marshaller.NewDefaultHTTPMarshaller()
-  patched_headers = dict(request.headers)
-  patched_headers['Content-Type'] = input_content_type
   event = m.FromRequest(
     v02.Event(),
-    patched_headers,
+    dict(request.headers),
     io.BytesIO(request.data),
-    lambda x: x
+    lambda x: json.loads(x.read())
   )
   (body, exist) = event.Get("data")
   app.logger.info(u'Event received:\n\t{}'.format(
@@ -40,7 +39,7 @@ def event_handler():
 
   hs, body = m.ToRequest(
     v02.Event()
-      .SetContentType('application/cloudevents+json')
+      .SetContentType(content_type)
       .SetData(json.dumps(payload))
       .SetEventID(str(uuid.uuid4()))
       .SetSource('com.ruggedcode.chat.emoji')

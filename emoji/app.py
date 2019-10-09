@@ -11,20 +11,20 @@ from cloudevents.sdk import converters
 
 lang  = os.environ['EMOJI_LANGUAGE']
 
-input_content_type = 'application/cloudevents+json'
-output_content_type = 'application/json'
+# Binary (Content-Type: application/json)
+#       The CloudEvent envelop will be in HTTP Headers
+#       The body of the request contains ONLY the "even data"
+content_type = 'application/json'
 
 app = Flask(__name__)
 @app.route('/', methods=['POST'])
 def event_handler():
   m = marshaller.NewDefaultHTTPMarshaller()
-  patched_headers = dict(request.headers)
-  patched_headers['Content-Type'] = input_content_type
   event = m.FromRequest(
     v02.Event(),
-    patched_headers,
+    dict(request.headers),
     io.BytesIO(request.data),
-    lambda x: x
+    lambda x: json.loads(x.read())
   )
   (body, exist) = event.Get("data")
   app.logger.info(u'Event received:\n\t{}'.format(
@@ -35,7 +35,7 @@ def event_handler():
 
   hs, body = m.ToRequest(
     v02.Event()
-      .SetContentType('application/cloudevents+json')
+      .SetContentType(content_type)
       .SetData(json.dumps(payload))
       .SetEventID(str(uuid.uuid4()))
       .SetSource('com.ruggedcode.chat.emoji')
@@ -53,14 +53,14 @@ def process_event(event):
     event['lang'] = lang
     event['text_emojized'] = ' '.join(words)
     event['emojized'] = words
-    return 200, payload
+    return 200, event
   elif 'text' in event:
     phrase = event['text']
     obj = emojize_phrase(lang, phrase)
     event['lang'] = lang
     event['text_emojized'] = ' '.join(obj['emojized'])
     event['emojized'] = obj['emojized']
-    return 200, payload
+    return 200, event
   else:
     return 400, {
       "status": "failed",
