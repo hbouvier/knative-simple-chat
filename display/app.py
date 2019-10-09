@@ -19,7 +19,7 @@ def event_handler():
     v02.Event(),
     dict(request.headers),
     io.BytesIO(request.data),
-    lambda x: json.loads(x.read())
+    lambda x: json.loads(str(x.read()))
   )
   (body, exist) = event.Get("data")
   app.logger.info(u'Event received:\n\t{}'.format(
