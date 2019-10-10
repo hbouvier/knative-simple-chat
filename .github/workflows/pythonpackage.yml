@@ -13,31 +13,44 @@ jobs:
         docker build -t docker.pkg.github.com/hbouvier/knative-simple-chat/emojizer:latest -f emoji/Dockerfile emoji/
     - name: Publish to Registry
       run: |
-        sudo apt-get -y install pass
-        curl -fsSL "https://github.com/docker/docker-credential-helpers/releases/download/v0.6.0/docker-credential-pass-v0.6.0-amd64.tar.gz" | tar xv
-        chmod + $(pwd)/docker-credential-pass
+ name: Python package
 
-        gpg --batch --gen-key <<-EOF ; pass init $(gpg --no-auto-check-trustdb --list-secret-keys | grep ^sec | cut -d/ -f2 | cut -d" " -f1)
-        %echo Generating a standard key
-        Key-Type: DSA
-        Key-Length: 1024
-        Subkey-Type: ELG-E
-        Subkey-Length: 1024
-        Name-Real: Meshuggah Rocks
-        Name-Email: meshuggah@example.com
-        Expire-Date: 0
-        # Do a commit here, so that we can later print "done" :-)
-        %commit
-        %echo done
-        EOF
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build docker container
+      run: |
+        docker build -t docker.pkg.github.com/hbouvier/knative-simple-chat/emojizer:latest -f emoji/Dockerfile emoji/
+    - name: Publish to Registry
+      run: |
+        # sudo apt-get -y install pass
+        # curl -fsSL "https://github.com/docker/docker-credential-helpers/releases/download/v0.6.0/docker-credential-pass-v0.6.0-amd64.tar.gz" | tar xv
+        # chmod + $(pwd)/docker-credential-pass
+
+        # gpg --batch --gen-key <<-EOF ; pass init $(gpg --no-auto-check-trustdb --list-secret-keys | grep ^sec | cut -d/ -f2 | cut -d" " -f1)
+        # %echo Generating a standard key
+        # Key-Type: DSA
+        # Key-Length: 1024
+        # Subkey-Type: ELG-E
+        # Subkey-Length: 1024
+        # Name-Real: Meshuggah Rocks
+        # Name-Email: meshuggah@example.com
+        # Expire-Date: 0
+        # # Do a commit here, so that we can later print "done" :-)
+        # %commit
+        # %echo done
+        # EOF
 
         echo "${DOCKER_PASSWORD}" | docker login docker.pkg.github.com --username $DOCKER_USERNAME --password-stdin
-        docker push docker.pkg.github.com/hbouvier/knative-simple-chat/emojizer:latest
+        docker push ${DOCKER_REGISTRY_URL}/hbouvier/knative-simple-chat/emojizer:latest
       env:
-        DOCKER_USERNAME: ${{ secrets.GITHUB_DOCKER_USERNAME }}
+        DOCKER_REGISTRY_URL: docker.pkg.github.com
+        DOCKER_USERNAME: ${{ github.actor }}
+        # DOCKER_USERNAME: ${{ secrets.GITHUB_DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.GITHUB_DOCKER_PASSWORD }}
 
-
-        #  DOCKER_REGISTRY_URL: docker.pkg.github.com
-        #  DOCKER_USERNAME: ${{ github.actor }}
-        #  DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
