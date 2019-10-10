@@ -13,21 +13,6 @@ jobs:
         docker build -t docker.pkg.github.com/hbouvier/knative-simple-chat/emojizer:latest -f emoji/Dockerfile emoji/
     - name: Publish to Registry
       run: |
- name: Python package
-
-on: [push]
-
-jobs:
-  build:
-
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Build docker container
-      run: |
-        docker build -t docker.pkg.github.com/hbouvier/knative-simple-chat/emojizer:latest -f emoji/Dockerfile emoji/
-    - name: Publish to Registry
-      run: |
         # sudo apt-get -y install pass
         # curl -fsSL "https://github.com/docker/docker-credential-helpers/releases/download/v0.6.0/docker-credential-pass-v0.6.0-amd64.tar.gz" | tar xv
         # chmod + $(pwd)/docker-credential-pass
