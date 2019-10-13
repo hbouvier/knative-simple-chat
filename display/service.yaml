@@ -1,0 +1,18 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: cloudevents-logger
+  namespace: tutorial
+spec:
+  template:
+    metadata:
+      name: cloudevents-logger-v5
+    spec:
+      containers:
+              ### - image: hbouvier/cloudevents-logger:v0.0.1
+              #        - image: hbouvier/display-event:latest
+              #- image: hbouvier/display-event-go:latest
+        - image: hbouvier/cloudevents-logger:v0.0.5
+          env:
+            - name: PREFIX
+              value: "v5"

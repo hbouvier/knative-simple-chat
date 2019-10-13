@@ -1,0 +1,15 @@
+version: '2'
+
+vars:
+  VERSION: v0.0.5
+
+tasks:
+  default:
+    deps: [cloudevents-logger]
+
+  cloudevents-logger:
+    cmds:
+      - docker build -t hbouvier/cloudevents-logger:{{.VERSION}} .
+      - docker push hbouvier/cloudevents-logger:{{.VERSION}}
+    status:
+      - docker pull hbouvier/cloudevents-logger:{{.VERSION}}
