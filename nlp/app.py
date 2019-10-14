@@ -42,7 +42,7 @@ def event_handler():
       .SetContentType(content_type)
       .SetData(json.dumps(payload))
       .SetEventID(str(uuid.uuid4()))
-      .SetSource('com.ruggedcode.chat.emoji')
+      .SetSource('com.ruggedcode.chat.lemma')
       .SetEventTime('{}00Z'.format(datetime.datetime.utcnow().isoformat()))
       .SetEventType('com.ruggedcode.chat.message.text'),
     converters.TypeBinary, # use TypeStructured to push to an ESB

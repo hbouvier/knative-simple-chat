@@ -1,8 +1,9 @@
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Trigger
 metadata:
-  name: chat-request-in-memory-trigger
+  name: broker-to-sequence-trigger
 spec:
+  broker: default
   filter:
     sourceAndType:
       # type: dev.knative.cronjob.event
@@ -13,4 +14,4 @@ spec:
     ref:
       apiVersion: messaging.knative.dev/v1alpha1
       kind: Sequence
-      name: chat-pipline
+      name: chat-pipeline

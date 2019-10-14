@@ -1,7 +1,7 @@
 version: '2'
 
 vars:
-  VERSION: v0.0.35
+  VERSION: v0.0.37
 
 tasks:
   default:

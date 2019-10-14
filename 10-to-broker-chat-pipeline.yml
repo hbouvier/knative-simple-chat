@@ -1,0 +1,48 @@
+apiVersion: messaging.knative.dev/v1alpha1
+kind: Sequence
+metadata:
+  name: chat-pipeline
+spec:
+  channelTemplate:
+    apiVersion: messaging.knative.dev/v1alpha1
+    kind: InMemoryChannel
+    # kind: KafkaChannel
+  steps:
+    - ref:
+        apiVersion: serving.knative.dev/v1alpha1
+        kind: Service
+        name: lemmanizer-fr
+    - ref:
+        apiVersion: serving.knative.dev/v1alpha1
+        kind: Service
+        name: emojizer
+  reply:
+    kind: Broker
+    apiVersion: eventing.knative.dev/v1alpha1
+    name: chat-response-in-memory
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Broker
+metadata:
+  name: chat-response-in-memory
+spec:
+  channelTemplateSpec:
+    apiVersion: messaging.knative.dev/v1alpha1
+    kind: InMemoryChannel
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: response-broker-to-event-logger-trigger
+spec:
+  broker: chat-response-in-memory
+  filter:
+    sourceAndType:
+      type : com.ruggedcode.chat.message.text
+      source : com.ruggedcode.chat.emoji
+
+  subscriber:
+    ref:
+      kind: Service
+      apiVersion: serving.knative.dev/v1alpha1
+      name: cloudevents-logger

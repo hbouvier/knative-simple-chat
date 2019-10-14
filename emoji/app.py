@@ -19,12 +19,13 @@ content_type = 'application/json'
 app = Flask(__name__)
 @app.route('/', methods=['POST'])
 def event_handler():
+  app.logger.info(u'headers\n\t{}'.format(request.headers))
   m = marshaller.NewDefaultHTTPMarshaller()
   event = m.FromRequest(
     v02.Event(),
     dict(request.headers),
     io.BytesIO(request.data),
-    lambda x: json.loads(str(x.read()))
+    lambda x: json.loads(x.read())
   )
   (body, exist) = event.Get("data")
   app.logger.info(u'Event received:\n\t{}'.format(

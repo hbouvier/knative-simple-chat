@@ -5,7 +5,7 @@ metadata:
 spec:
   template:
     metadata:
-      # name: emojizer-v14
+      name: emojizer-v26
       annotations:
         # Default: Knative concurrency-based autoscaling with
         # 100 requests in-flight per pod.
@@ -22,7 +22,7 @@ spec:
         # autoscaling.knative.dev/maxScale: "5"
     spec:
       containers:
-        - image: hbouvier/emojizer:latest
+        - image: hbouvier/emojizer:v0.0.26
           env:
             - name: EMOJI_LANGUAGE
               value: fr-CA

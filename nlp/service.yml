@@ -5,7 +5,7 @@ metadata:
 spec:
   template:
     metadata:
-      name: lemmanizer-fr-v35
+      name: lemmanizer-fr-v37
       annotations:
         # Default: Knative concurrency-based autoscaling with
         # 100 requests in-flight per pod.
@@ -22,7 +22,7 @@ spec:
         # autoscaling.knative.dev/maxScale: "5"
     spec:
       containers:
-        - image: hbouvier/spacy_fr_lemmatizer:v0.0.35
+        - image: hbouvier/spacy_fr_lemmatizer:v0.0.37
           env:
             - name: SPACY_LANGUAGE
               value: fr-CA

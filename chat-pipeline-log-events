@@ -1,0 +1,2 @@
+#!/bin/sh
+kubectl logs -fc user-container $(kubectl get pods | grep cloudevents-logger | tail -1 | awk '{print $1}')
