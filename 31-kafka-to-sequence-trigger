@@ -1,0 +1,17 @@
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: kafka-to-sequence-trigger
+spec:
+  broker: kafka-chat-inbound
+  filter:
+    sourceAndType:
+      # type: dev.knative.cronjob.event
+      type : com.ruggedcode.chat.message.text
+      #source : "https://ruggedcode.com/cloudevents/spec/chat"
+
+  subscriber:
+    ref:
+      apiVersion: messaging.knative.dev/v1alpha1
+      kind: Sequence
+      name: chat-pipeline
