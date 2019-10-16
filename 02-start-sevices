@@ -1,0 +1,3 @@
+kn service create lemmanizer-fr --image=hbouvier/spacy_fr_lemmatizer:v0.0.37 --env SPACY_LANGUAGE=fr-CA --env SPACY_LANGUAGE_MODEL=fr_core_news_sm --annotation autoscaling.knative.dev/minScale=1
+kn service create emojizer --image=hbouvier/emojizer:v0.0.26 --env EMOJI_LANGUAGE=fr-CA
+kn service create cloudevents-logger --image=hbouvier/cloudevents-logger:v0.0.5
