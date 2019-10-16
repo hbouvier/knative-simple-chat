@@ -1,3 +1,10 @@
-kn service create lemmanizer-fr --image=hbouvier/spacy_fr_lemmatizer:v0.0.37 --env SPACY_LANGUAGE=fr-CA --env SPACY_LANGUAGE_MODEL=fr_core_news_sm --annotation autoscaling.knative.dev/minScale=1
-kn service create emojizer --image=hbouvier/emojizer:v0.0.26 --env EMOJI_LANGUAGE=fr-CA
-kn service create cloudevents-logger --image=hbouvier/cloudevents-logger:v0.0.5
+#!/bin/sh
+OPTIONS="--limits-cpu=1m --limits-memory=100Mi"
+
+if [ "$1" == "--no-scale-zero" ] ; then
+	OPTIONS="${OPTIONS} --annotation autoscaling.knative.dev/minScale=1"
+fi
+
+kn service create lemmanizer-fr --image=hbouvier/spacy_fr_lemmatizer:v0.0.37 --env SPACY_LANGUAGE=fr-CA --env SPACY_LANGUAGE_MODEL=fr_core_news_sm ${OPTIONS}
+kn service create emojizer --image=hbouvier/emojizer:v0.0.26 --env EMOJI_LANGUAGE=fr-CA  ${OPTIONS}
+kn service create cloudevents-logger --image=hbouvier/cloudevents-logger:v0.0.5 ${OPTIONS}

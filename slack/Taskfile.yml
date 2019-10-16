@@ -1,0 +1,15 @@
+version: '2'
+
+vars:
+  VERSION: v0.0.1
+
+tasks:
+  default:
+    deps: [slackit]
+
+  slackit:
+    cmds:
+      - docker build -t hbouvier/slackit:{{.VERSION}} .
+      - docker push hbouvier/slackit:{{.VERSION}}
+    status:
+      - docker pull hbouvier/slackit:{{.VERSION}}
