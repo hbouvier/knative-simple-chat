@@ -21,6 +21,42 @@ nlp = spacy.load(model)
 content_type = 'application/json'
 
 app = Flask(__name__)
+
+def process_event(cloud_event):
+  (event, exist) = cloud_event.Get("data")
+  app.logger.info(u'Event received:\n\t{}'.format(
+      cloud_event.Properties()
+    )
+  )
+
+  if 'text' in event:
+    phrase = event['text']
+    obj = lemmatize(phrase)
+    event['lang'] = lang
+    event['lemmas'] = obj['lemmas']
+    event['tokens'] = obj['tokens']
+    return 200, event
+  else:
+    return 400, {
+      "status": "failed",
+      "message" : "event must have 'text' property."
+    }
+
+def lemmatize(phrase):
+  doc = nlp(phrase)
+  lemmas = [token.lemma_ for token in doc]
+  tokens = [token.text for token in doc]
+  return {
+    "lang": lang,
+    "lemmas": lemmas,
+    "tokens": tokens
+  }
+
+
+
+###############################################################################
+
+
 @app.route('/', methods=['POST'])
 def event_handler():
   m = marshaller.NewDefaultHTTPMarshaller()
@@ -51,35 +87,9 @@ def event_handler():
   response = Response(body, status=status, headers=dict(hs))
   return response
 
-def process_event(event):
-  if 'text' in event:
-    phrase = event['text']
-    obj = lemmatize(phrase)
-    event['lang'] = lang
-    event['lemmas'] = obj['lemmas']
-    event['tokens'] = obj['tokens']
-    return 200, event
-  else:
-    return 400, {
-      "status": "failed",
-      "message" : "event must have 'text' property."
-    }
 
-def info(msg):
-    app.logger.info(msg)
-
-def get_custom_headers(headers):
-  return { key : value for (key, value) in headers.items() if key[:3] == 'Ce-' or key[:2] == 'X-' }
-
-def lemmatize(phrase):
-  doc = nlp(phrase)
-  lemmas = [token.lemma_ for token in doc]
-  tokens = [token.text for token in doc]
-  return {
-    "lang": lang,
-    "lemmas": lemmas,
-    "tokens": tokens
-  }
+# def get_custom_headers(headers):
+#   return { key : value for (key, value) in headers.items() if key[:3] == 'Ce-' or key[:2] == 'X-' }
 
 if __name__ != '__main__':
   # Redirect Flask logs to Gunicorn logs

@@ -17,38 +17,14 @@ lang  = os.environ['EMOJI_LANGUAGE']
 content_type = 'application/json'
 
 app = Flask(__name__)
-@app.route('/', methods=['POST'])
-def event_handler():
-  app.logger.info(u'headers\n\t{}'.format(request.headers))
-  m = marshaller.NewDefaultHTTPMarshaller()
-  event = m.FromRequest(
-    v02.Event(),
-    dict(request.headers),
-    io.BytesIO(request.data),
-    lambda x: json.loads(x.read())
-  )
-  (body, exist) = event.Get("data")
+
+def process_event(cloud_event):
+  (event, exist) = cloud_event.Get("data")
   app.logger.info(u'Event received:\n\t{}'.format(
-      event.Properties(),
+      cloud_event.Properties()
     )
   )
-  (status, payload) = process_event(body)
 
-  hs, body = m.ToRequest(
-    v02.Event()
-      .SetContentType(content_type)
-      .SetData(json.dumps(payload))
-      .SetEventID(str(uuid.uuid4()))
-      .SetSource('com.ruggedcode.chat.emoji')
-      .SetEventTime('{}00Z'.format(datetime.datetime.utcnow().isoformat()))
-      .SetEventType('com.ruggedcode.chat.message.text'),
-    converters.TypeBinary, # use TypeStructured to push to an ESB
-    lambda x: x
-  )
-  response = Response(body, status=status, headers=dict(hs))
-  return response
-
-def process_event(event):
   if 'lemmas' in event and 'tokens' in event:
     words = emojize_lemmas(lang, event['lemmas'], event['tokens'])
     event['lang'] = lang
@@ -67,12 +43,6 @@ def process_event(event):
       "status": "failed",
       "message" : "event must have either a 'text' property or 'lemmas' and 'tokens'."
     }
-
-def info(msg):
-    app.logger.info(msg)
-
-def get_custom_headers(headers):
-  return { key : value for (key, value) in headers.items() if key[:3] == 'Ce-' or key[:2] == 'X-' }
 
 def loadfile(filename):
   with open(filename) as json_file:
@@ -108,6 +78,38 @@ def emojize(lang, word):
     if word == key or word in keywords:
       return emoji['char']
   return word
+
+###############################################################################
+@app.route('/', methods=['POST'])
+def event_handler():
+  app.logger.info(u'headers\n\t{}'.format(request.headers))
+  m = marshaller.NewDefaultHTTPMarshaller()
+  event = m.FromRequest(
+    v02.Event(),
+    dict(request.headers),
+    io.BytesIO(request.data),
+    lambda x: json.loads(x.read())
+  )
+  (status, payload) = process_event(event)
+
+  hs, body = m.ToRequest(
+    v02.Event()
+      .SetContentType(content_type)
+      .SetData(json.dumps(payload))
+      .SetEventID(str(uuid.uuid4()))
+      .SetSource('com.ruggedcode.chat.emoji')
+      .SetEventTime('{}00Z'.format(datetime.datetime.utcnow().isoformat()))
+      .SetEventType('com.ruggedcode.chat.message.text'),
+    converters.TypeBinary, # use TypeStructured to push to an ESB
+    lambda x: x
+  )
+  response = Response(body, status=status, headers=dict(hs))
+  return response
+
+
+# def get_custom_headers(headers):
+#   return { key : value for (key, value) in headers.items() if key[:3] == 'Ce-' or key[:2] == 'X-' }
+
 
 emojis = loadfile('newemojis.json')
 

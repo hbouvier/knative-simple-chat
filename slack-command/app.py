@@ -14,6 +14,31 @@ content_type = 'application/json'
 webhook_url = os.environ['BROKER_URL']
 
 app = Flask(__name__)
+
+def process_event(headers, data):
+  app.logger.info(u'Binary event produced:\n\t{}\n\t{}'.format(
+      headers,
+      data
+    )
+  )
+
+  response = requests.post(
+    webhook_url,
+    headers=dict(headers),
+    data=data
+  )
+  app.logger.info(u'Slacking \n\t{}\n\tCODE: {}'.format(data, response.status_code))
+  app.logger.info(u'\tdata: \t{}'.format(response.text))
+  if response.status_code < 200 or  response.status_code > 204:
+    raise ValueError(
+        'Request to slack returned an error %s, the response is:\n%s'
+        % (response.status_code, response.text)
+    )
+  return response.status_code
+
+
+###############################################################################
+
 @app.route('/', methods=['POST'])
 def event_handler():
   # Parse the parameters you need
@@ -24,7 +49,8 @@ def event_handler():
   if not token:  # or some other failure condition
     abort(400)
 
-  app.logger.info(u'slack command received:\n\t{}'.format(
+  app.logger.info(u'slack command received:\n\tcommand: \t{}\n\ttext: \t{}'.format(
+      command, 
       text
     )
   )
@@ -32,7 +58,7 @@ def event_handler():
   hs, body = m.ToRequest(
     v02.Event()
       .SetContentType(content_type)
-      .SetData(json.dumps({"text": text}))
+      .SetData(json.dumps({"command": command,"text": text}))
       .SetEventID(str(uuid.uuid4()))
       .SetSource("com.ruggedcode.chat.slack")
       .SetEventTime("{}00Z".format(datetime.datetime.utcnow().isoformat()))
@@ -40,21 +66,8 @@ def event_handler():
     converters.TypeBinary, # use TypeStructured to push to an ESB
     lambda x: x
   )
-
-  response = requests.post(
-    webhook_url,
-    headers=dict(hs),
-    data=body
-  )
-  app.logger.info(u'Slacking \n\t{}\n\tCODE: {}'.format(body, response.status_code))
-  app.logger.info(u'data:\n\t{}'.format(response.text))
-  if response.status_code < 200 or  response.status_code > 204:
-    raise ValueError(
-        'Request to slack returned an error %s, the response is:\n%s'
-        % (response.status_code, response.text)
-    )
-
-  response = Response(None, status=204)
+  status_code = process_event(hs, body)
+  response = Response(None, status=status_code)
   # response = Response(body, status=200, headers=dict(hs))
   return response
 

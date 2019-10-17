@@ -10,8 +10,20 @@ from cloudevents.sdk import marshaller
 from cloudevents.sdk import converters
 
 content_type = 'application/json'
-
 app = Flask(__name__)
+
+
+def process_event(cloud_event):
+  (body, exist) = cloud_event.Get("data")
+  app.logger.info(u'Event received:\n\t{}'.format(
+      cloud_event.Properties()
+    )
+  )
+  return body
+
+
+###############################################################################
+
 @app.route('/', methods=['POST'])
 def event_handler():
   m = marshaller.NewDefaultHTTPMarshaller()
@@ -21,11 +33,9 @@ def event_handler():
     io.BytesIO(request.data),
     lambda x: json.loads(x.read())
   )
-  (body, exist) = event.Get("data")
-  app.logger.info(u'Event received:\n\t{}'.format(
-      event.Properties(),
-    )
-  )
+
+  body = process_event(event)
+
   hs, body = m.ToRequest(
     v02.Event()
       .SetContentType(content_type)

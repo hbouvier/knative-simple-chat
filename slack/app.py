@@ -17,17 +17,11 @@ webhook_url = os.environ['SLACK_WEBHOOK_URL']
 
 app = Flask(__name__)
 @app.route('/', methods=['POST'])
-def event_handler():
-  m = marshaller.NewDefaultHTTPMarshaller()
-  event = m.FromRequest(
-    v02.Event(),
-    dict(request.headers),
-    io.BytesIO(request.data),
-    lambda x: json.loads(x.read())
-  )
-  (body, exist) = event.Get("data")
+
+def process_event(cloud_event):
+  (body, exist) = cloud_event.Get("data")
   app.logger.info(u'Event received:\n\t{}'.format(
-      event.Properties(),
+      cloud_event.Properties()
     )
   )
   if 'text_emojized' in body:
@@ -39,8 +33,6 @@ def event_handler():
             'CloudEvent must have an "text_mojized" or "text" property'
     )
   slackit(message)
-  response = Response(None, status=204)
-  return response
 
 def slackit(message):
   slack_data = {"text": message}
@@ -56,6 +48,21 @@ def slackit(message):
         'Request to slack returned an error %s, the response is:\n%s'
         % (response.status_code, response.text)
     )
+
+###############################################################################
+
+def event_handler():
+  m = marshaller.NewDefaultHTTPMarshaller()
+  event = m.FromRequest(
+    v02.Event(),
+    dict(request.headers),
+    io.BytesIO(request.data),
+    lambda x: json.loads(x.read())
+  )
+  process_event(event)
+  response = Response(None, status=204)
+  return response
+
 
 if __name__ != '__main__':
   # Redirect Flask logs to Gunicorn logs
