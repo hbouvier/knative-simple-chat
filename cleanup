@@ -1,0 +1,7 @@
+#!/bin/sh
+kubectl edit ns henri
+for i in $(kubectl get trigger | grep -v NAME | awk '{print $1}'); do kubectl delete trigger $i ;done
+kubectl delete sequence.messaging.knative.dev/chat-pipeline
+for i in $(kn service list | grep -v NAME | awk '{print $1}') ; do kubectl delete ksvc/$i ; done
+for i in $(kubectl get broker | grep -v NAME | awk '{print $1}') ; do kubectl delete broker $i ; done
+
