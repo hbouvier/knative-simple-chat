@@ -1,3 +1,6 @@
+#!/bin/sh
+
+kubectl apply -f - <<EOF
 apiVersion: serving.knative.dev/v1alpha1
 kind: Service
 metadata:
@@ -5,13 +8,14 @@ metadata:
 spec:
   template:
     metadata:
-      name: slackit-v1
+#      name: slackit-v1
       annotations:
         autoscaling.knative.dev/minScale: "1"
 
     spec:
       containers:
-        - image: hbouvier/slackit:v0.0.1
+        - image: hbouvier/slackit:$(cat VERSION.txt)
           env:
             - name: SLACK_WEBHOOK_URL
-              value: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+              value: ${SLACK_WEBHOOK_URL}
+EOF

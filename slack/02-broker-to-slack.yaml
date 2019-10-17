@@ -1,0 +1,17 @@
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: to-slack-trigger
+spec:
+  broker: chat-response-in-memory
+  filter:
+    sourceAndType:
+      type : com.ruggedcode.chat.message.text
+      source : com.ruggedcode.chat.emoji
+
+  subscriber:
+    ref:
+      kind: Service
+      apiVersion: serving.knative.dev/v1alpha1
+      name: slackit

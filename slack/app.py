@@ -31,22 +31,26 @@ def event_handler():
     )
   )
   if 'text_emojized' in body:
-    message = body['emojized']
+    message = body['text_emojized']
   elif 'text' in body:
     message = body['text']
   else:
     raise ValueError(
             'CloudEvent must have an "text_mojized" or "text" property'
     )
+  slackit(message)
   response = Response(None, status=204)
   return response
 
 def slackit(message):
-  slack_data = {'text': message}
+  slack_data = {"text": message}
   response = requests.post(
-    webhook_url, data=json.dumps(slack_data),
-    headers={'Content-Type': 'application/json'}
+    webhook_url,
+    headers={'Content-type': 'application/json'}, 
+    data=json.dumps(slack_data)
   )
+  app.logger.info(u'Slacking \n\t{}\n\tCODE: {}'.format(slack_data, response.status_code))
+  app.logger.info(u'data:\n\t{}'.format(response.text))
   if response.status_code != 200:
     raise ValueError(
         'Request to slack returned an error %s, the response is:\n%s'

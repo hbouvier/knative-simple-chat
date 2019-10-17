@@ -1,0 +1,20 @@
+version: '2'
+
+vars:
+  VERSION: $(cat VERSION.txt)
+
+tasks:
+  default:
+    deps: [deploy]
+
+  deploy:
+    deps: [build]
+    cmds:
+      - ./service.yaml.sh
+
+  build:
+    cmds:
+      - docker build -t hbouvier/slack-command:{{.VERSION}} .
+      - docker push hbouvier/slack-command:{{.VERSION}}
+    status:
+      - docker pull hbouvier/slack-command:{{.VERSION}}

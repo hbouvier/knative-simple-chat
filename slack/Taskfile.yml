@@ -1,11 +1,16 @@
 version: '2'
 
 vars:
-  VERSION: v0.0.1
+  VERSION: $(cat VERSION.txt)
 
 tasks:
   default:
+    deps: [deploy]
+
+  deploy:
     deps: [slackit]
+    cmds:
+      - ./service.yaml.sh
 
   slackit:
     cmds:
